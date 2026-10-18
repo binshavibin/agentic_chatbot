@@ -1,6 +1,11 @@
 from langgraph.graph import StateGraph,START,END
 from src.langgraph.state.state import State
 from src.langgraph.nodes.basic_chatbot_node import BasicChatbotNode
+from src.langgraph.tools.search_tool import get_tools,create_tools_node
+from langgraph.prebuilt import tools_condition,ToolNode
+from src.langgraph.nodes.chatbot_with_tools_node import ChatbotToolNode
+
+
 
 class GraphBuilder:
     def __init__(self,model):
@@ -17,12 +22,39 @@ class GraphBuilder:
         self.graph_builder.add_edge(START,"chatbot")
         self.graph_builder.add_edge("chatbot",END)
 
+    def chatbot_with_tools_with_graph(self):
+        """
+        Build an advanced chatbot graph with tool integration.
+        This method creates a chatbot graph that includes both chatbot and tool.
+        """
+        #Define the tools and tool node
+        tools = get_tools()
+        tool_node =create_tools_node(tools)
+
+        #Defins LLM
+        llm = self.llm
+
+        obj_chat = ChatbotToolNode(llm)
+        chatbot_node = obj_chat.create_chatbot(tools)
+
+        self.graph_builder.add_node("chatbot",chatbot_node)
+        self.graph_builder.add_node("tools",tool_node)
+
+        self.graph_builder.add_edge(START,"chatbot")
+        self.graph_builder.add_conditional_edges("chatbot",tools_condition)
+        self.graph_builder.add_edge("tools","chatbot")
+        self.graph_builder.add_edge("chatbot",END)
+
+
+
     def setup_graph(self,usecase:str):
         """
         Setup graph for specific usecase
         """
         if usecase =="Basic Chatbot":
             self.basic_chatbot_build_graph()
+        if usecase =="Chatbot with Web":
+            self.chatbot_with_tools_with_graph()
 
         return self.graph_builder.compile()
 
