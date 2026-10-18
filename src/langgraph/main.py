@@ -38,7 +38,7 @@ def load_langgraph_app():
                 display_result = DisplayResult(usecase,graph,user_meesage)
                 display_result.display_result_on_ui()
             except Exception as e:
-                st.error("Graph set up failed {e}")
+                st.error(f"Graph set up failed: {e}")
 
         except Exception as e:
-            ValueError("error {e}")
+            st.error(f"Error: {e}")

@@ -28,5 +28,5 @@ class LoadStreamlitUI:
                     st.warning("Please enter Groq API KEY to continue")
 
             #Usecase selection
-            self.user_controls['select_usecase'] = st.selectbox("Select Usecase",usecase_options)
+            self.user_controls['selected_usecase'] = st.selectbox("Select Usecase",usecase_options)
         return self.user_controls
