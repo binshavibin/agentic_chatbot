@@ -30,11 +30,55 @@ class AINewsNode:
             topic="news",
             time_range=time_range_map[frequency],
             include_answer='advanced',
-            max_result = 10,
+            max_results = 10,
             days= days_map[frequency]
         )
 
-        state['news_data'] = response.get('result',[])
+        state['news_data'] = response.get('results',[])
         self.state['news_data'] = state['news_data']
         return state
+
+    def summarize_news(self,state:dict)->dict:
+        """
+        Summarize the fetched news using LLM.
+        Args:
+            state(dict): State dictionary containing 'news_data'
+        Returns: 
+            dict:Updated news with 'summary' key containing summarized news
+        """
+
+        news_items = self.state['news_data']
+        prompt_template = ChatPromptTemplate.from_messages([
+            ('system',""" SUmmarize AI News articles into markdown format.For each item include:
+            -Date  in  **YYYY-MM-DD** format in IST Timezone
+            -Concise sentence summary from latest news
+            -sort news by date wise(latest first)
+            - Source url as link
+            Use Format: 
+            ###[Date]
+            -[Summary](URL)"""),
+            ("user","Articles:\n{articles}")
+            
+        ])
+
+        articles_str = "\n\n".join([
+            f"Content:{item.get('content','')} \nURL:{item.get('url','')}\nDate:{item.get('published_date','')}"
+            for item in news_items  
+        ])
+
+        response = self.llm.invoke(prompt_template.format(articles=articles_str))
+        state['summary'] = response.content
+        self.state['summary'] = state['summary']
+        return self.state
+
+    def save_result(self,state):
+        frequency = self.state['frequency']
+        summary = self.state['summary']
+        filename = f"./AINews/{frequency}_summary.md"
+        with open(filename,'w') as f:
+            f.write(f"#{frequency.capitalize()} AI News SUmmary\n\n ")
+            f.write(summary)
+        self.state['filename'] = filename
+        return self.state
+        
 

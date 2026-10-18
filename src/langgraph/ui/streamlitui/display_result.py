@@ -37,6 +37,20 @@ class DisplayResult:
                 elif type(message) == AIMessage and message.content:
                     with st.chat_message("assistant"):
                         st.write(message.content)
+        elif usecase =="AI News":
+            frequency = self.user_message.lower()
+            with st.spinner("Fetching and summarizing News"):
+                result  = graph.invoke({'messages':frequency})
+            try:
+                AI_NEWS_PATH = f"./AINews/{frequency}_summary.md"
+                with open(AI_NEWS_PATH,'r') as file:
+                    markdown_content = file.read()
+                    st.markdown(markdown_content,unsafe_allow_html=True)
+            except FileNotFoundError:
+                st.error("File not found")
+            except Exception as e:
+                st.error(f"Error occured {e}")
+
 
 
 

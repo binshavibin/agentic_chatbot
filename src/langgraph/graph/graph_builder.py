@@ -4,6 +4,7 @@ from src.langgraph.nodes.basic_chatbot_node import BasicChatbotNode
 from src.langgraph.tools.search_tool import get_tools,create_tools_node
 from langgraph.prebuilt import tools_condition,ToolNode
 from src.langgraph.nodes.chatbot_with_tools_node import ChatbotToolNode
+from src.langgraph.nodes.ai_news_node import AINewsNode
 
 
 
@@ -46,9 +47,11 @@ class GraphBuilder:
         self.graph_builder.add_edge("chatbot",END)
 
     def ai_news_builder_graph(self):
-        self.graph_builder.add_node("fetch_news","")
-        self.graph_builder.add_node("summarize_news","")
-        self.graph_builder.add_node("save_result","")
+        ai_news_node=AINewsNode()
+
+        self.graph_builder.add_node("fetch_news",ai_news_node.fetch_news)
+        self.graph_builder.add_node("summarize_news",ai_news_node.summarize_news)
+        self.graph_builder.add_node("save_result",ai_news_node.save_result)
 
         self.graph_builder.set_entry_point("fetch_news")
         self.graph_builder.add_edge("fetch_news","summarize_news")
@@ -67,6 +70,8 @@ class GraphBuilder:
             self.basic_chatbot_build_graph()
         if usecase =="Chatbot with Web":
             self.chatbot_with_tools_with_graph()
+        if usecase =="AI News":
+            self.ai_news_builder_graph()
 
         return self.graph_builder.compile()
 
