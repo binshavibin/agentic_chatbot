@@ -16,8 +16,10 @@ def load_langgraph_app():
         st.error("Failed to load user input from ui")
         return
 
-
-    user_meesage = st.chat_input("Enter your message")
+    if st.session_state.IsFetchButtonClicked:
+        user_meesage = st.session_state.timeframe
+    else:
+        user_meesage = st.chat_input("Enter your message")
     if user_meesage:
         try:
             obj_llm_config =GroqLLM(user_controls_input=user_input)

@@ -42,8 +42,8 @@ class DisplayResult:
             with st.spinner("Fetching and summarizing News"):
                 result  = graph.invoke({'messages':frequency})
             try:
-                AI_NEWS_PATH = f"./AINews/{frequency}_summary.md"
-                with open(AI_NEWS_PATH,'r') as file:
+                AI_NEWS_PATH = f"./src/AINews/{frequency}_summary.md"
+                with open(AI_NEWS_PATH,'r',encoding='utf-8') as file:
                     markdown_content = file.read()
                     st.markdown(markdown_content,unsafe_allow_html=True)
             except FileNotFoundError:
